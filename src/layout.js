@@ -92,10 +92,10 @@ DagreLayout.prototype.run = function(){
 
   dagre.layout( g );
 
-  var gEdgeIds = g.edges();
-  for( var i = 0; i < gEdgeIds.length; i++ ){
-    var id = gEdgeIds[i];
-    var e = g.edge( id );
+  let gEdgeIds = g.edges();
+  for( let i = 0; i < gEdgeIds.length; i++ ){
+    let id = gEdgeIds[i];
+    let e = g.edge( id );
 
     if (e && e.points) {
       if (e.points.length > 3) {
@@ -119,7 +119,19 @@ DagreLayout.prototype.run = function(){
             return result;
           }
 
-          result.distance = (slope * pSegment.x - pSegment.y + yIntercept) / (Math.sqrt(Math.pow(slope, 2) + 1));
+          //result.distance = (slope * pSegment.x - pSegment.y + yIntercept) / (Math.sqrt(Math.pow(slope, 2) + 1));
+
+          let y2 = pEnd.y;
+          let y1 = pStart.y;
+          let x2 = pEnd.x;
+          let x1 = pStart.x;
+          let y3 = pSegment.y;
+          let x3 = pSegment.x;
+          let k = ((y2-y1) * (x3-x1) - (x2-x1) * (y3-y1)) / (Math.pow((y2-y1), 2) + (Math.pow((x2-x1), 2)));
+          let x4 = x3 - k * (y2-y1);
+          let y4 = y3 + k * (x2-x1);
+
+          result.distance = (Math.sqrt(Math.pow((y4-y3), 2) + Math.pow((x4-x3), 2)));
 
           let d = (pSegment.x - pStart.x) * (pEnd.y - pStart.y) - (pSegment.y - pStart.y) * (pEnd.x - pStart.x);
           if(d > 0) {
@@ -131,10 +143,14 @@ DagreLayout.prototype.run = function(){
 
           result.weight = distanceOrhthogonal / Math.sqrt(Math.pow(pEnd.x - pStart.x, 2) + Math.pow(pEnd.y - pStart.y, 2));
 
+          if(result.weight < 0) {
+            result.weight = -result.weight;
+          }
+
           return result;
         };
 
-        for ( let j = 1; j < e.points.length - 1; j++) {
+        for ( var j = 1; j < e.points.length - 1; j++) {
           distances.push(getDistance(e.points[j]));
         }
 
